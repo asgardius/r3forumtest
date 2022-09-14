@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:theme="@style/Theme.AppCompat"
+    android:background="@drawable/galaxy"
     tools:context=".MainActivity">
 
     <TextView
@@ -13,7 +14,7 @@
         android:layout_height="wrap_content"
         android:text="Nombre de usuario"
         android:textAlignment="center"
-        android:textColor="?attr/colorOnSecondary"
+        android:textColor="@color/white"
         android:textSize="25sp" />
 
     <EditText
@@ -24,8 +25,8 @@
         android:focusable="true"
         android:hint="Nombre de usuario"
         android:inputType="textNoSuggestions"
-        android:textColorHint="?attr/colorOnSecondary"
-        android:textColor="?attr/colorOnSecondary"
+        android:textColorHint="@color/white"
+        android:textColor="@color/white"
         tools:ignore="MissingConstraints" />
 
     <TextView
@@ -33,7 +34,7 @@
         android:layout_height="wrap_content"
         android:text="Contraseña"
         android:textAlignment="center"
-        android:textColor="?attr/colorOnSecondary"
+        android:textColor="@color/white"
         android:textSize="25sp" />
 
     <EditText
@@ -44,8 +45,8 @@
         android:focusable="true"
         android:hint="Contraseña"
         android:inputType="textPassword"
-        android:textColorHint="?attr/colorOnSecondary"
-        android:textColor="?attr/colorOnSecondary"
+        android:textColorHint="@color/white"
+        android:textColor="@color/white"
         tools:ignore="MissingConstraints" />
 
     <LinearLayout
@@ -62,9 +63,9 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:backgroundTint="?attr/colorOnSecondary"
+            android:backgroundTint="@color/black"
             android:text="Iniciar Sesión"
-            android:textColor="?attr/colorOnPrimary"
+            android:textColor="@color/white"
             tools:ignore="MissingConstraints" />
 
         <Button
@@ -72,9 +73,9 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:backgroundTint="?attr/colorOnSecondary"
+            android:backgroundTint="@color/black"
             android:text="Registrarse"
-            android:textColor="?attr/colorOnPrimary"
+            android:textColor="@color/white"
             tools:ignore="MissingConstraints" />
 
     </LinearLayout>
