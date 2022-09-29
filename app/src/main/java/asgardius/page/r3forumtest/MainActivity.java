@@ -37,10 +37,10 @@ public class MainActivity extends AppCompatActivity {
         if (db != null) {
             // Database Queries
             try {
-                String query = "SELECT username, password FROM account";
+                String query = "SELECT username FROM account";
                 Cursor cursor = db.rawQuery(query,null);
                 if (cursor.moveToNext()){
-                    login(cursor.getString(0), cursor.getString(1));
+                    mainScreen(cursor.getString(0));
                     db.close();
                 }
             } catch (Exception e) {
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //buttonaction
                 if(user.getText().toString().equals("") || pwd.getText().toString().equals("")) {
-                    Toast.makeText(getApplicationContext(),"Introduzac el usuario y contraseña", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"Introduzca el usuario y contraseña", Toast.LENGTH_SHORT).show();
                 } else {
                     login(user.getText().toString().toLowerCase(), pwd.getText().toString());
                 }
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
                                     db.execSQL("DELETE FROM account");
                                     db.execSQL("INSERT INTO account VALUES (\""+username+"\", \""+password+"\")");
                                     db.close();
-                                    mainScreen();
+                                    mainScreen(username);
                                 } catch (Exception e) {
                                     Toast.makeText(getApplicationContext(),"Base de datos corrupta", Toast.LENGTH_SHORT).show();
                                 }
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void mainScreen () {
+    private void mainScreen (String username) {
 
         Intent intent = new Intent(this, MainScreen.class);
         startActivity(intent);
