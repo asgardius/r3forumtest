@@ -1,5 +1,6 @@
 package asgardius.page.r3forumtest;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.net.URL;
+import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -62,10 +64,10 @@ public class SignUp extends AppCompatActivity {
                                 myConnection.setRequestMethod("POST");
                                 // Create the data
                                 myData = "{\n" +
-                                        "\"id\": \""+user.getText().toString()+"\",\n" +
+                                        "\"id\": \""+user.getText().toString().toLowerCase()+"\",\n" +
                                         "\"firstname\": \""+fname.getText().toString()+"\",\n" +
                                         "\"lastname\":\""+lname.getText().toString()+"\",\n" +
-                                        "\"email\":\""+mail.getText().toString()+"\",\n" +
+                                        "\"email\":\""+mail.getText().toString().toLowerCase()+"\",\n" +
                                         "\"password\": \""+pwd.getText().toString()+"\",\n" +
                                         "\"country\":\""+nacion.getText().toString()+"\",\n" +
                                         "\"birthdate\": \""+datey.getText().toString()+"-"+datem.getText().toString()+"-"+dated.getText().toString()+"\"\n" +
@@ -88,6 +90,7 @@ public class SignUp extends AppCompatActivity {
                                         //Test
                                         if (success) {
                                             Toast.makeText(getApplicationContext(), "Registro exitoso", Toast.LENGTH_SHORT).show();
+                                            mainmenu();
                                         } else {
                                             Toast.makeText(getApplicationContext(), "El usuario ya existe", Toast.LENGTH_SHORT).show();
                                         }
@@ -104,7 +107,7 @@ public class SignUp extends AppCompatActivity {
                                     }
                                 });
                                 //Toast.makeText(getApplicationContext(),getResources().getString(R.string.media_list_fail), Toast.LENGTH_SHORT).show();
-                                finish();
+                                //finish();
                             }
                         }
                     });
@@ -113,5 +116,14 @@ public class SignUp extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void mainmenu() {
+
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("EXIT", true);
+        startActivity(intent);
+
     }
 }
