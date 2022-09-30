@@ -144,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
     private void mainScreen (String username) {
 
         Intent intent = new Intent(this, MainScreen.class);
+        intent.putExtra("username", username);
         startActivity(intent);
 
     }
