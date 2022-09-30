@@ -11,7 +11,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.net.URL;
-import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -90,7 +89,7 @@ public class SignUp extends AppCompatActivity {
                                         //Test
                                         if (success) {
                                             Toast.makeText(getApplicationContext(), "Registro exitoso", Toast.LENGTH_SHORT).show();
-                                            mainmenu();
+                                            mainMenu();
                                         } else {
                                             Toast.makeText(getApplicationContext(), "El usuario ya existe", Toast.LENGTH_SHORT).show();
                                         }
@@ -118,7 +117,7 @@ public class SignUp extends AppCompatActivity {
         });
     }
 
-    private void mainmenu() {
+    private void mainMenu() {
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

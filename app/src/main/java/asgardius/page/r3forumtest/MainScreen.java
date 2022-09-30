@@ -3,8 +3,14 @@ package asgardius.page.r3forumtest;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -20,12 +26,21 @@ public class MainScreen extends AppCompatActivity {
     boolean success;
     BufferedReader br;
     StringBuilder sb;
+    JSONObject jsonObj;
+    SQLiteDatabase db;
+    MyDbHelper dbHelper;
+    TextView id;
+    Button logout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
         username = getIntent().getStringExtra("username");
+        id = (TextView) findViewById(R.id.username);
+        logout = (Button)findViewById(R.id.logout);
+        dbHelper = new MyDbHelper(this);
+        id.setText(username);
         Thread login = new Thread(new Runnable() {
 
             @Override
@@ -54,6 +69,7 @@ public class MainScreen extends AppCompatActivity {
                             sb.append(output);
                         }
                         System.out.println(sb.toString());
+                        jsonObj = new JSONObject(sb.toString());
                     } else {
                         success = false;
                     }
@@ -86,8 +102,54 @@ public class MainScreen extends AppCompatActivity {
                 }
             }
         });
-
         login.start();
+        logout.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                //buttonaction
+                Thread logout = new Thread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        try  {
+                            db = dbHelper.getWritableDatabase();
+                            db.execSQL("DELETE FROM account");
+                            db.close();
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    //Test
+                                    mainMenu();
+                                }
+                            });
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getApplicationContext(), "Conexión fallida", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            //Toast.makeText(getApplicationContext(),getResources().getString(R.string.media_list_fail), Toast.LENGTH_SHORT).show();
+                            //finish();
+                        }
+                    }
+                });
+                logout.start();
+            }
+        });
+    }
+
+    private void mainMenu() {
+
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("EXIT", true);
+        startActivity(intent);
+
     }
 
     public void onBackPressed(){
