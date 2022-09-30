@@ -29,7 +29,7 @@ public class MainScreen extends AppCompatActivity {
     JSONObject jsonObj;
     SQLiteDatabase db;
     MyDbHelper dbHelper;
-    TextView id;
+    TextView id ,email, nacionalidad, nacimiento;
     Button logout;
 
     @Override
@@ -38,6 +38,9 @@ public class MainScreen extends AppCompatActivity {
         setContentView(R.layout.activity_main_screen);
         username = getIntent().getStringExtra("username");
         id = (TextView) findViewById(R.id.username);
+        email = (TextView) findViewById(R.id.email);
+        nacionalidad = (TextView) findViewById(R.id.nacionalidad);
+        nacimiento = (TextView) findViewById(R.id.nacimiento);
         logout = (Button)findViewById(R.id.logout);
         dbHelper = new MyDbHelper(this);
         id.setText(username);
@@ -81,6 +84,13 @@ public class MainScreen extends AppCompatActivity {
                             //Test
                             if (success) {
                                 Toast.makeText(getApplicationContext(), "Credenciales correctas", Toast.LENGTH_SHORT).show();
+                                try {
+                                    email.setText((String) jsonObj.getJSONArray("items").getJSONObject(0).getString("email"));
+                                    nacionalidad.setText((String) jsonObj.getJSONArray("items").getJSONObject(0).getString("country"));
+                                    nacimiento.setText((String) jsonObj.getJSONArray("items").getJSONObject(0).getString("birthdate"));
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
 
                             } else {
                                 Toast.makeText(getApplicationContext(), "Credenciales incorrectas", Toast.LENGTH_SHORT).show();
