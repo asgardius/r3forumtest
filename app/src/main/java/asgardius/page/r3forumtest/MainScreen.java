@@ -1,9 +1,17 @@
 package asgardius.page.r3forumtest;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.media.AudioAttributes;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -30,7 +38,8 @@ public class MainScreen extends AppCompatActivity {
     SQLiteDatabase db;
     MyDbHelper dbHelper;
     TextView id ,email, nacionalidad, nacimiento;
-    Button logout;
+    Button logout, notification;
+    Uri crashsound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +51,9 @@ public class MainScreen extends AppCompatActivity {
         nacionalidad = (TextView) findViewById(R.id.nacionalidad);
         nacimiento = (TextView) findViewById(R.id.nacimiento);
         logout = (Button)findViewById(R.id.logout);
+        notification = (Button)findViewById(R.id.notification);
         dbHelper = new MyDbHelper(this);
+        crashsound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + this.getPackageName() + "/" + R.raw.crash);
         id.setText(username);
         Thread login = new Thread(new Runnable() {
 
@@ -113,6 +124,31 @@ public class MainScreen extends AppCompatActivity {
             }
         });
         login.start();
+        notification.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                //buttonaction
+                if(Build.VERSION.SDK_INT >=Build.VERSION_CODES.O){
+
+                    NotificationChannel channel= new NotificationChannel("Test","Test Notification",NotificationManager.IMPORTANCE_DEFAULT);
+                    NotificationManager manager =getSystemService(NotificationManager.class);
+                    AudioAttributes audio = new AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                            .build();
+                    channel.setSound(crashsound, audio);
+                    manager.createNotificationChannel(channel);
+                }
+                String message="Su nave ha chocado con un asteroide";
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(MainScreen.this,"Test");
+                builder.setContentTitle("Prueba");
+                builder.setContentText(message);
+                builder.setSmallIcon(R.drawable.ic_launcher_foreground);
+                builder.setAutoCancel(true);
+                builder.setSound(crashsound);
+                NotificationManagerCompat managerCompat=NotificationManagerCompat.from(MainScreen.this);
+                managerCompat.notify(1,builder.build());
+            }
+        });
         logout.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {

@@ -13,19 +13,20 @@
         android:id="@+id/linearLayoutSubmit"
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:layout_margin="20dp"
+        android:layout_margin="0dp"
         android:orientation="horizontal"
         tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="20dp">
 
-        <TextView
-            android:id="@+id/username"
+        <Button
+            android:id="@+id/notification"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textAlignment="center"
+            android:backgroundTint="@color/black"
+            android:text="Notificar"
             android:textColor="@color/white"
-            android:textSize="25sp" />
+            tools:ignore="MissingConstraints" />
 
         <Button
             android:id="@+id/logout"
@@ -38,6 +39,14 @@
             tools:ignore="MissingConstraints" />
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="25sp" />
 
     <TextView
         android:id="@+id/email"
