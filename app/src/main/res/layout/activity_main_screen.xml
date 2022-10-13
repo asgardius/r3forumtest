@@ -4,13 +4,13 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/galaxy"
     android:orientation="vertical"
     android:theme="@style/Theme.AppCompat"
-    android:background="@drawable/galaxy"
     tools:context=".MainScreen">
 
     <LinearLayout
-        android:id="@+id/linearLayoutSubmit"
+        android:id="@+id/linearLayoutAction"
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:layout_margin="0dp"
@@ -71,5 +71,37 @@
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="25sp" />
+
+    <LinearLayout
+        android:id="@+id/linearLayoutAdmin"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_margin="0dp"
+        android:orientation="horizontal"
+        android:visibility="invisible"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="20dp">
+
+        <Button
+            android:id="@+id/editaccount"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:backgroundTint="@color/black"
+            android:text="Editar"
+            android:textColor="@color/white"
+            tools:ignore="MissingConstraints" />
+
+        <Button
+            android:id="@+id/deleteaccount"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:backgroundTint="@color/black"
+            android:text="Eliminar"
+            android:textColor="@color/white"
+            tools:ignore="MissingConstraints" />
+
+    </LinearLayout>
 
 </LinearLayout>

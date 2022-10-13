@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,7 +30,7 @@ import javax.net.ssl.HttpsURLConnection;
 public class MainScreen extends AppCompatActivity {
     String username;
     HttpsURLConnection myConnection;
-    String myData;
+    String myData, usertype;
     URL endpoint;
     boolean success;
     BufferedReader br;
@@ -38,7 +39,8 @@ public class MainScreen extends AppCompatActivity {
     SQLiteDatabase db;
     MyDbHelper dbHelper;
     TextView id ,email, nacionalidad, nacimiento;
-    Button logout, notification;
+    Button logout, notification, edit, delete;
+    LinearLayout adminactions;
     Uri crashsound;
 
     @Override
@@ -52,6 +54,9 @@ public class MainScreen extends AppCompatActivity {
         nacimiento = (TextView) findViewById(R.id.nacimiento);
         logout = (Button)findViewById(R.id.logout);
         notification = (Button)findViewById(R.id.notification);
+        adminactions = (LinearLayout) findViewById(R.id.linearLayoutAdmin);
+        edit = (Button)findViewById(R.id.editaccount);
+        delete = (Button)findViewById(R.id.deleteaccount);
         dbHelper = new MyDbHelper(this);
         crashsound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + this.getPackageName() + "/" + R.raw.crash);
         id.setText(username);
@@ -94,11 +99,15 @@ public class MainScreen extends AppCompatActivity {
                         public void run() {
                             //Test
                             if (success) {
-                                Toast.makeText(getApplicationContext(), "Credenciales correctas", Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(getApplicationContext(), "Credenciales correctas", Toast.LENGTH_SHORT).show();
                                 try {
                                     email.setText((String) jsonObj.getJSONArray("items").getJSONObject(0).getString("email"));
                                     nacionalidad.setText((String) jsonObj.getJSONArray("items").getJSONObject(0).getString("country"));
                                     nacimiento.setText((String) jsonObj.getJSONArray("items").getJSONObject(0).getString("birthdate"));
+                                    usertype = (String) jsonObj.getJSONArray("items").getJSONObject(0).getString("permission");
+                                    if (usertype.equals("admin")) {
+                                        adminactions.setVisibility(View.VISIBLE);
+                                    }
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -185,6 +194,20 @@ public class MainScreen extends AppCompatActivity {
                     }
                 });
                 logout.start();
+            }
+        });
+        edit.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                //buttonaction
+                Toast.makeText(getApplicationContext(),"editar", Toast.LENGTH_SHORT).show();
+            }
+        });
+        delete.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                //buttonaction
+                Toast.makeText(getApplicationContext(),"eliminar", Toast.LENGTH_SHORT).show();
             }
         });
     }
