@@ -1,10 +1,9 @@
 package asgardius.page.r3forumtest;
 
-import android.content.Intent;
-import android.os.Bundle;
-
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,42 +13,27 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class SignUp extends AppCompatActivity {
-    Button signUp;
-    EditText user, pwd, pwdc, nacion, fname, lname, mail, dated, datem, datey;
-    URL endpoint;
-    HttpsURLConnection myConnection;
+public class AccountDel extends AppCompatActivity {
+    EditText user;
+    Button delAccount;
     boolean success;
+    HttpsURLConnection myConnection;
+    URL endpoint;
     String myData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_up);
+        setContentView(R.layout.activity_account_del);
         user = (EditText)findViewById(R.id.username);
-        pwd = (EditText)findViewById(R.id.password);
-        pwdc = (EditText)findViewById(R.id.passwordConfirm);
-        nacion = (EditText)findViewById(R.id.nacionalidad);
-        fname = (EditText)findViewById(R.id.firstname);
-        mail = (EditText)findViewById(R.id.email);
-        dated = (EditText)findViewById(R.id.Date);
-        datem = (EditText)findViewById(R.id.Month);
-        datey = (EditText)findViewById(R.id.Year);
-        lname = (EditText)findViewById(R.id.lastname);
-        signUp = (Button)findViewById(R.id.signUp);
+        delAccount = (Button)findViewById(R.id.delete);
 
-        signUp.setOnClickListener(new View.OnClickListener(){
+        delAccount.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                 //buttonaction
-                if(user.getText().toString().equals("") || pwd.getText().toString().equals("") ||
-                        pwdc.getText().toString().equals("") || nacion.getText().toString().equals("") ||
-                        fname.getText().toString().equals("") || lname.getText().toString().equals("") ||
-                        mail.getText().toString().equals("") || dated.getText().toString().equals("") ||
-                        datem.getText().toString().equals("") || datey.getText().toString().equals("")) {
-                    Toast.makeText(getApplicationContext(),"Todos los campos son obligatorios", Toast.LENGTH_SHORT).show();
-                } else if(!pwd.getText().toString().equals(pwdc.getText().toString())) {
-                    Toast.makeText(getApplicationContext(),"Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
+                if(user.getText().toString().equals("")) {
+                    Toast.makeText(getApplicationContext(),"Seleccione un usuario", Toast.LENGTH_SHORT).show();
                 }else {
                     Thread login = new Thread(new Runnable() {
 
@@ -57,26 +41,20 @@ public class SignUp extends AppCompatActivity {
                         public void run() {
                             try  {
                                 //Your code goes here
-                                endpoint = new URL("https://desktop.asgardius.company/test/restful/items/create.php");
+                                endpoint = new URL("https://desktop.asgardius.company/test/restful/items/delete.php");
                                 myConnection = (HttpsURLConnection) endpoint.openConnection();
                                 myConnection.setRequestProperty("User-Agent", "r3-forum-test");
                                 myConnection.setRequestMethod("POST");
                                 // Create the data
                                 myData = "{\n" +
-                                        "\"id\": \""+user.getText().toString().toLowerCase()+"\",\n" +
-                                        "\"firstname\": \""+fname.getText().toString()+"\",\n" +
-                                        "\"lastname\":\""+lname.getText().toString()+"\",\n" +
-                                        "\"email\":\""+mail.getText().toString().toLowerCase()+"\",\n" +
-                                        "\"password\": \""+pwd.getText().toString()+"\",\n" +
-                                        "\"country\":\""+nacion.getText().toString()+"\",\n" +
-                                        "\"birthdate\": \""+datey.getText().toString()+"-"+datem.getText().toString()+"-"+dated.getText().toString()+"\"\n" +
+                                        "\"id\": \""+user.getText().toString().toLowerCase()+"\"\n" +
                                         "}";
                                 // Enable writing
                                 myConnection.setDoOutput(true);
                                 // Write the data
                                 myConnection.getOutputStream().write(myData.getBytes());
                                 System.out.println(myConnection.getResponseCode());
-                                if (myConnection.getResponseCode() == 201) {
+                                if (myConnection.getResponseCode() == 200) {
                                     success = true;
                                 } else {
                                     success = false;
@@ -88,10 +66,10 @@ public class SignUp extends AppCompatActivity {
                                     public void run() {
                                         //Test
                                         if (success) {
-                                            Toast.makeText(getApplicationContext(), "Registro exitoso", Toast.LENGTH_SHORT).show();
-                                            mainMenu();
+                                            Toast.makeText(getApplicationContext(), "Usuario eliminado", Toast.LENGTH_SHORT).show();
+                                            finish();
                                         } else {
-                                            Toast.makeText(getApplicationContext(), "El usuario ya existe", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getApplicationContext(), "Usuario inexistente", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 });
@@ -119,7 +97,7 @@ public class SignUp extends AppCompatActivity {
 
     private void mainMenu() {
 
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, MainScreen.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("EXIT", true);
         startActivity(intent);

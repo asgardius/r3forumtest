@@ -16,6 +16,20 @@
         android:theme="@style/Theme.R3ForumTest"
         tools:targetApi="31">
         <activity
+            android:name=".AccountDel"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".AccountEdit"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".MainScreen"
             android:exported="false">
             <meta-data

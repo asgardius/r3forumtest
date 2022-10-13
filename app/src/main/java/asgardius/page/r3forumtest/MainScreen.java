@@ -67,6 +67,7 @@ public class MainScreen extends AppCompatActivity {
                 try  {
                     //Your code goes here
                     endpoint = new URL("https://desktop.asgardius.company/test/restful/items/read.php");
+                    //System.out.println(endpoint);
                     myConnection = (HttpsURLConnection) endpoint.openConnection();
                     myConnection.setRequestProperty("User-Agent", "r3-forum-test");
                     myConnection.setRequestMethod("POST");
@@ -87,7 +88,7 @@ public class MainScreen extends AppCompatActivity {
                         while ((output = br.readLine()) != null) {
                             sb.append(output);
                         }
-                        System.out.println(sb.toString());
+                        //System.out.println(sb.toString());
                         jsonObj = new JSONObject(sb.toString());
                     } else {
                         success = false;
@@ -200,14 +201,16 @@ public class MainScreen extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //buttonaction
-                Toast.makeText(getApplicationContext(),"editar", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),"editar", Toast.LENGTH_SHORT).show();
+                accountEdit();
             }
         });
         delete.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                 //buttonaction
-                Toast.makeText(getApplicationContext(),"eliminar", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),"eliminar", Toast.LENGTH_SHORT).show();
+                accountDelete();
             }
         });
     }
@@ -217,6 +220,20 @@ public class MainScreen extends AppCompatActivity {
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("EXIT", true);
+        startActivity(intent);
+
+    }
+
+    private void accountEdit() {
+
+        Intent intent = new Intent(this, AccountEdit.class);
+        startActivity(intent);
+
+    }
+
+    private void accountDelete() {
+
+        Intent intent = new Intent(this, AccountDel.class);
         startActivity(intent);
 
     }

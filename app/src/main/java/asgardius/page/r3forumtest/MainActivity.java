@@ -12,9 +12,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -50,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         }
         user = (EditText)findViewById(R.id.username);
         pwd = (EditText)findViewById(R.id.password);
-        signUp = (Button)findViewById(R.id.signup);
+        signUp = (Button)findViewById(R.id.delete);
         login = (Button)findViewById(R.id.login);
         signUp.setOnClickListener(new View.OnClickListener(){
             @Override

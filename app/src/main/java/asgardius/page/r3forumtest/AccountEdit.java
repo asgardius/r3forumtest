@@ -1,31 +1,34 @@
 package asgardius.page.r3forumtest;
 
-import android.content.Intent;
-import android.os.Bundle;
-
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class SignUp extends AppCompatActivity {
-    Button signUp;
+public class AccountEdit extends AppCompatActivity {
+    Button editUser;
     EditText user, pwd, pwdc, nacion, fname, lname, mail, dated, datem, datey;
+    @SuppressLint("UseSwitchCompatOrMaterialCode")
+    Switch setAdmin;
     URL endpoint;
     HttpsURLConnection myConnection;
     boolean success;
-    String myData;
+    String myData, permission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_up);
+        setContentView(R.layout.activity_account_edit);
         user = (EditText)findViewById(R.id.username);
         pwd = (EditText)findViewById(R.id.password);
         pwdc = (EditText)findViewById(R.id.passwordConfirm);
@@ -36,9 +39,10 @@ public class SignUp extends AppCompatActivity {
         datem = (EditText)findViewById(R.id.Month);
         datey = (EditText)findViewById(R.id.Year);
         lname = (EditText)findViewById(R.id.lastname);
-        signUp = (Button)findViewById(R.id.signUp);
+        setAdmin = (Switch)findViewById(R.id.permission);
+        editUser = (Button)findViewById(R.id.edituser);
 
-        signUp.setOnClickListener(new View.OnClickListener(){
+        editUser.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                 //buttonaction
@@ -57,7 +61,12 @@ public class SignUp extends AppCompatActivity {
                         public void run() {
                             try  {
                                 //Your code goes here
-                                endpoint = new URL("https://desktop.asgardius.company/test/restful/items/create.php");
+                                if(setAdmin.isChecked()) {
+                                    permission = "admin";
+                                } else {
+                                    permission = "user";
+                                }
+                                endpoint = new URL("https://desktop.asgardius.company/test/restful/items/update.php");
                                 myConnection = (HttpsURLConnection) endpoint.openConnection();
                                 myConnection.setRequestProperty("User-Agent", "r3-forum-test");
                                 myConnection.setRequestMethod("POST");
@@ -69,14 +78,15 @@ public class SignUp extends AppCompatActivity {
                                         "\"email\":\""+mail.getText().toString().toLowerCase()+"\",\n" +
                                         "\"password\": \""+pwd.getText().toString()+"\",\n" +
                                         "\"country\":\""+nacion.getText().toString()+"\",\n" +
-                                        "\"birthdate\": \""+datey.getText().toString()+"-"+datem.getText().toString()+"-"+dated.getText().toString()+"\"\n" +
+                                        "\"birthdate\": \""+datey.getText().toString()+"-"+datem.getText().toString()+"-"+dated.getText().toString()+"\",\n" +
+                                        "\"permission\":\""+permission+"\"\n" +
                                         "}";
                                 // Enable writing
                                 myConnection.setDoOutput(true);
                                 // Write the data
                                 myConnection.getOutputStream().write(myData.getBytes());
                                 System.out.println(myConnection.getResponseCode());
-                                if (myConnection.getResponseCode() == 201) {
+                                if (myConnection.getResponseCode() == 200) {
                                     success = true;
                                 } else {
                                     success = false;
@@ -88,10 +98,10 @@ public class SignUp extends AppCompatActivity {
                                     public void run() {
                                         //Test
                                         if (success) {
-                                            Toast.makeText(getApplicationContext(), "Registro exitoso", Toast.LENGTH_SHORT).show();
-                                            mainMenu();
+                                            Toast.makeText(getApplicationContext(), "Datos actualizados", Toast.LENGTH_SHORT).show();
+                                            finish();
                                         } else {
-                                            Toast.makeText(getApplicationContext(), "El usuario ya existe", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getApplicationContext(), "Usuario invalido", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 });
@@ -119,7 +129,7 @@ public class SignUp extends AppCompatActivity {
 
     private void mainMenu() {
 
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, MainScreen.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("EXIT", true);
         startActivity(intent);

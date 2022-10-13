@@ -4,10 +4,10 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/galaxy"
     android:orientation="vertical"
     android:theme="@style/Theme.AppCompat"
-    android:background="@drawable/wormhole"
-    tools:context=".SignUp">
+    tools:context=".AccountEdit">
 
     <EditText
         android:id="@+id/firstname"
@@ -163,16 +163,23 @@
         android:layout_height="70dp"
         android:layout_margin="20dp"
         android:orientation="horizontal"
-        tools:ignore="MissingConstraints"
+        tools:ignore="MissingConstraints,UseSwitchCompatOrMaterialXml"
         tools:layout_editor_absoluteX="20dp">
 
+        <Switch
+            android:id="@+id/permission"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Administrador" />
+
         <Button
-            android:id="@+id/signUp"
+            android:id="@+id/edituser"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:backgroundTint="@color/black"
-            android:text="Registrarse"
+            android:text="Guardar cambios"
             android:textColor="@color/white"
             tools:ignore="MissingConstraints" />
 
