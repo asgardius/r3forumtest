@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:theme="@style/Theme.AppCompat"
-    android:background="@drawable/wormhole"
+    android:background="@drawable/galaxy"
     tools:context=".SignUp">
 
     <EditText
