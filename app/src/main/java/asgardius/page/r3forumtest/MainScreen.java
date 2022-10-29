@@ -6,6 +6,8 @@ import static android.Manifest.permission.READ_PHONE_NUMBERS;
 import static android.Manifest.permission.READ_PHONE_STATE;
 import static android.Manifest.permission.READ_SMS;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +15,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.ContentResolver;
@@ -20,10 +23,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.Button;
@@ -36,6 +43,8 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.text.MessageFormat;
+import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -51,26 +60,42 @@ public class MainScreen extends AppCompatActivity {
     SQLiteDatabase db;
     MyDbHelper dbHelper;
     TextView id ,email, nacionalidad, nacimiento;
-    Button logout, notification, edit, delete;
+    Button logout, notification, edit, delete, viewlocation;
     LinearLayout adminactions;
     Uri crashsound;
     TextView textView;
     TelephonyManager telephonyManager;
+    private Location lastLocation;
+    private LocationManager locManager;
+
+    private final LocationListener locListener = new LocationListener() {
+        public void onLocationChanged(Location loc) {
+            updateLocation(loc);
+        }
+
+        public void onProviderEnabled(String provider) {
+            updateLocation();
+        }
+
+        public void onProviderDisabled(String provider) {
+            updateLocation();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
         textView = findViewById(R.id.location);
-        telephonyManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+        /*telephonyManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, READ_SMS) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{READ_SMS, READ_PHONE_NUMBERS, READ_PHONE_STATE,ACCESS_FINE_LOCATION}, 100);
         } else {
             textView.setText(""+telephonyManager.getCellLocation());
-        }
+        }*/
         username = getIntent().getStringExtra("username");
         id = (TextView) findViewById(R.id.username);
         email = (TextView) findViewById(R.id.email);
@@ -81,7 +106,10 @@ public class MainScreen extends AppCompatActivity {
         adminactions = (LinearLayout) findViewById(R.id.linearLayoutAdmin);
         edit = (Button)findViewById(R.id.editaccount);
         delete = (Button)findViewById(R.id.deleteaccount);
+        viewlocation = (Button)findViewById(R.id.view_location);
         dbHelper = new MyDbHelper(this);
+        locManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        startRequestingLocation();
         crashsound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + this.getPackageName() + "/" + R.raw.crash);
         id.setText(username);
         Thread login = new Thread(new Runnable() {
@@ -237,6 +265,7 @@ public class MainScreen extends AppCompatActivity {
                 accountDelete();
             }
         });
+        viewlocation.setOnClickListener(this::viewLocation);
     }
 
     private void mainMenu() {
@@ -268,6 +297,50 @@ public class MainScreen extends AppCompatActivity {
         a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(a);
     }
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    startRequestingLocation();
+                } else {
+                    Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            });
+
+    private void startRequestingLocation() {
+        if (!locManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            return;
+        }
+
+        final String permission = Manifest.permission.ACCESS_FINE_LOCATION;
+        if (ActivityCompat.checkSelfPermission(this, permission)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(permission);
+            return;
+        }
+
+        // GPS enabled and have permission - start requesting location updates
+        locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locListener);
+    }
+
+    private void updateLocation() {
+        // Trigger a UI update without changing the location
+        updateLocation(lastLocation);
+    }
+
+    private void updateLocation(Location location) {
+        boolean locationEnabled = locManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean waitingForLocation = locationEnabled && !validLocation(location);
+        boolean haveLocation = locationEnabled && !waitingForLocation;
+
+        if (haveLocation) {
+            String newline = System.getProperty("line.separator");
+            viewlocation.setEnabled(true);
+            textView.setText("Ubicación obtenida");
+            lastLocation = location;
+        }
+    }
+
 
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
@@ -281,8 +354,80 @@ public class MainScreen extends AppCompatActivity {
                         ActivityCompat.checkSelfPermission(this, READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
                     return;
                 } else {
-                    textView.setText(""+telephonyManager.getCellLocation());
+                    try {
+                        textView.setText(""+telephonyManager.getCellLocation());
+                    } catch (Exception e) {
+                        textView.setText("Ubicación desactivada");
+                    }
                 }
         }
+    }
+
+    private boolean validLocation(Location location) {
+        if (location == null) {
+            return false;
+        }
+
+        // Location must be from less than 30 seconds ago to be considered valid
+        if (Build.VERSION.SDK_INT < 17) {
+            return System.currentTimeMillis() - location.getTime() < 30e3;
+        } else {
+            return SystemClock.elapsedRealtimeNanos() - location.getElapsedRealtimeNanos() < 30e9;
+        }
+    }
+
+    private String getAccuracy(Location location) {
+        float accuracy = location.getAccuracy();
+        if (accuracy < 0.01) {
+            return "?";
+        } else if (accuracy > 99) {
+            return "99+";
+        } else {
+            return String.format(Locale.US, "%2.0fm", accuracy);
+        }
+    }
+
+    private String getLatitude(Location location) {
+        return String.format(Locale.US, "%2.5f", location.getLatitude());
+    }
+
+    private String getDMSLatitude(Location location) {
+        double val = location.getLatitude();
+        return String.format(Locale.US, "%.0f° %2.0f′ %2.3f″ %s",
+                Math.floor(Math.abs(val)),
+                Math.floor(Math.abs(val * 60) % 60),
+                (Math.abs(val) * 3600) % 60,
+                val > 0 ? "N" : "S"
+        );
+    }
+
+    private String getDMSLongitude(Location location) {
+        double val = location.getLongitude();
+        return String.format(Locale.US, "%.0f° %2.0f′ %2.3f″ %s",
+                Math.floor(Math.abs(val)),
+                Math.floor(Math.abs(val * 60) % 60),
+                (Math.abs(val) * 3600) % 60,
+                val > 0 ? "E" : "W"
+        );
+    }
+
+    private String getLongitude(Location location) {
+        return String.format(Locale.US, "%3.5f", location.getLongitude());
+    }
+
+    private String formatLocation(Location location, String format) {
+        return MessageFormat.format(format,
+                getLatitude(location), getLongitude(location));
+    }
+
+    public void viewLocation(View view) {
+        if (!validLocation(lastLocation)) {
+            return;
+        }
+
+        String uri = formatLocation(lastLocation, "geo:{0},{1}?q={0},{1}");
+
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+        startActivity(Intent.createChooser(intent, getString(R.string.view_location_via)));
     }
 }
