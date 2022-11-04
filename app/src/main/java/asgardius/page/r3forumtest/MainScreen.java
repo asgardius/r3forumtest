@@ -21,6 +21,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
@@ -31,6 +32,7 @@ import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.SystemClock;
 import android.telephony.TelephonyManager;
 import android.view.View;
@@ -43,6 +45,9 @@ import android.widget.Toast;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -468,7 +473,8 @@ public class MainScreen extends AppCompatActivity {
                 if (resultData != null && resultData.getData() != null) {
                     fileuri = resultData.getData();
                     System.out.println(fileuri.toString());
-                    Toast.makeText(getApplicationContext(),fileuri.toString(), Toast.LENGTH_SHORT).show();
+                    pictureUpdate();
+                    //Toast.makeText(getApplicationContext(),fileuri.toString(), Toast.LENGTH_SHORT).show();
                     //System.out.println("File selected successfully");
                     //System.out.println("content://com.android.externalstorage.documents"+file.getPath());
                 } else {
@@ -480,5 +486,27 @@ public class MainScreen extends AppCompatActivity {
                 finish();
             }
         }
+    }
+
+    public void pictureUpdate() {
+        String path = getFilesDir().getAbsolutePath() + "/profile";
+        ContextWrapper contextWrapper = new ContextWrapper(getApplicationContext());
+        File directory = contextWrapper.getDir(getFilesDir().getName(), Context.MODE_PRIVATE);
+        File file =  new File(getFilesDir(),"profile");
+        try {
+            InputStream in = getContentResolver().openInputStream(fileuri);
+            FileOutputStream out = new FileOutputStream(file, false);
+            byte[] buffer = new byte[1024];
+            for (int len; (len = in.read(buffer)) != -1; ) {
+                out.write(buffer, 0, len);
+            }
+            out.close();
+            in.close();
+            Toast.makeText(getApplicationContext(),"Imagen de perfil actualizada", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            System.out.println(e);
+            Toast.makeText(getApplicationContext(),"No se pudo actualizar la imagen de perfil", Toast.LENGTH_SHORT).show();
+        }
+
     }
 }
