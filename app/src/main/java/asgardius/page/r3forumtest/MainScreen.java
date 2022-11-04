@@ -16,6 +16,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.ContentResolver;
@@ -34,6 +35,7 @@ import android.os.SystemClock;
 import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,6 +55,7 @@ public class MainScreen extends AppCompatActivity {
     HttpsURLConnection myConnection;
     String myData, usertype;
     URL endpoint;
+    Intent intent;
     boolean success;
     BufferedReader br;
     StringBuilder sb;
@@ -62,11 +65,12 @@ public class MainScreen extends AppCompatActivity {
     TextView id ,email, nacionalidad, nacimiento;
     Button logout, notification, edit, delete, viewlocation;
     LinearLayout adminactions;
-    Uri crashsound;
+    Uri crashsound, fileuri;
     TextView textView;
     TelephonyManager telephonyManager;
     private Location lastLocation;
     private LocationManager locManager;
+    ImageView profile;
 
     private final LocationListener locListener = new LocationListener() {
         public void onLocationChanged(Location loc) {
@@ -87,6 +91,7 @@ public class MainScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
         textView = findViewById(R.id.location);
+        profile = (ImageView) findViewById(R.id.userPicture);
         /*telephonyManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, READ_SMS) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED &&
@@ -186,6 +191,13 @@ public class MainScreen extends AppCompatActivity {
             }
         });
         login.start();
+        profile.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                //buttonaction
+                performFileSearch("Select file to upload");
+            }
+        });
         notification.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
@@ -429,5 +441,44 @@ public class MainScreen extends AppCompatActivity {
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
         startActivity(Intent.createChooser(intent, getString(R.string.view_location_via)));
+    }
+
+    private void performFileSearch(String messageTitle) {
+        //uri = Uri.parse("content://com.android.externalstorage.documents/document/home");
+        intent = new Intent();
+        intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        //intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+        //intent.putExtra("android.provider.extra.INITIAL_URI", uri);
+        intent.setType("*/*");
+        ((Activity) this).startActivityForResult(intent, 100);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, final Intent resultData) {
+        // The ACTION_OPEN_DOCUMENT intent was sent with the request code OPEN_DIRECTORY_REQUEST_CODE.
+        // If the request code seen here doesn't match, it's the response to some other intent,
+        // and the below code shouldn't run at all.
+        super.onActivityResult(requestCode, resultCode, resultData);
+        if (requestCode == 100) {
+            if (resultCode == Activity.RESULT_OK) {
+                // The document selected by the user won't be returned in the intent.
+                // Instead, a URI to that document will be contained in the return intent
+                // provided to this method as a parameter.  Pull that uri using "resultData.getData()"
+                if (resultData != null && resultData.getData() != null) {
+                    fileuri = resultData.getData();
+                    System.out.println(fileuri.toString());
+                    Toast.makeText(getApplicationContext(),fileuri.toString(), Toast.LENGTH_SHORT).show();
+                    //System.out.println("File selected successfully");
+                    //System.out.println("content://com.android.externalstorage.documents"+file.getPath());
+                } else {
+                    Toast.makeText(MainScreen.this, getResources().getString(R.string.file_path_fail), Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            } else {
+                //System.out.println("User cancelled file browsing {}");
+                finish();
+            }
+        }
     }
 }
