@@ -25,6 +25,7 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -122,6 +123,7 @@ public class MainScreen extends AppCompatActivity {
         startRequestingLocation();
         crashsound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + this.getPackageName() + "/" + R.raw.crash);
         id.setText(username);
+        pictureLoad();
         Thread login = new Thread(new Runnable() {
 
             @Override
@@ -489,9 +491,6 @@ public class MainScreen extends AppCompatActivity {
     }
 
     public void pictureUpdate() {
-        String path = getFilesDir().getAbsolutePath() + "/profile";
-        ContextWrapper contextWrapper = new ContextWrapper(getApplicationContext());
-        File directory = contextWrapper.getDir(getFilesDir().getName(), Context.MODE_PRIVATE);
         File file =  new File(getFilesDir(),"profile");
         try {
             InputStream in = getContentResolver().openInputStream(fileuri);
@@ -503,10 +502,43 @@ public class MainScreen extends AppCompatActivity {
             out.close();
             in.close();
             Toast.makeText(getApplicationContext(),"Imagen de perfil actualizada", Toast.LENGTH_SHORT).show();
+            pictureLoad();
         } catch (Exception e) {
             System.out.println(e);
             Toast.makeText(getApplicationContext(),"No se pudo actualizar la imagen de perfil", Toast.LENGTH_SHORT).show();
         }
+    }
 
+    public void pictureLoad() {
+        Thread imgread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try  {
+                    //Your code goes here
+                    File file =  new File(getFilesDir(),"profile");
+                    Drawable thumb_d = Drawable.createFromPath(file.toString());
+
+                    runOnUiThread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            profile.setImageDrawable(thumb_d);
+
+                        }
+                    });
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    runOnUiThread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                        }
+                    });
+                }
+            }
+        });
+        imgread.start();
     }
 }
