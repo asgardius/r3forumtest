@@ -481,11 +481,9 @@ public class MainScreen extends AppCompatActivity {
                     //System.out.println("content://com.android.externalstorage.documents"+file.getPath());
                 } else {
                     Toast.makeText(MainScreen.this, getResources().getString(R.string.file_path_fail), Toast.LENGTH_SHORT).show();
-                    finish();
                 }
             } else {
                 //System.out.println("User cancelled file browsing {}");
-                finish();
             }
         }
     }
@@ -523,7 +521,9 @@ public class MainScreen extends AppCompatActivity {
 
                         @Override
                         public void run() {
-                            profile.setImageDrawable(thumb_d);
+                            if(file.exists()) {
+                                profile.setImageDrawable(thumb_d);
+                            }
 
                         }
                     });
